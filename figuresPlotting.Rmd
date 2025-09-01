@@ -1,0 +1,129 @@
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+```
+
+###load all_data
+```{r}
+all_metrics <- read.csv("all_data_batch1/split_average_performance.csv", header = TRUE)
+
+all_metrics <- all_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(all_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+all_metrics <- all_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(all_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", label = TRUE, lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1)
+```
+
+###load top 40
+```{r}
+top40_metrics <- read.csv("40_features_batch1/split_average_performance.csv", header = TRUE)
+
+top40_metrics <- top40_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(top40_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+top40_metrics <- top40_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(top40_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", label = TRUE, lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1)
+```
+
+###load top 20
+```{r}
+top20_metrics <- read.csv("20_features_batch1/split_average_performance.csv", header = TRUE)
+
+top20_metrics <- top20_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(top20_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+top20_metrics <- top20_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(top20_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", label = TRUE, lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1)
+```
+
+###Plot basemean of DEGs
+```{r}
+baseMean_df <- read.table("baseMean.txt", sep = "\t", header = TRUE)
+
+baseMean_df$baseMean <- log2(baseMean_df$baseMean)
+
+baseMean_df$labels <- ifelse(baseMean_df$Biomarkers %in% c("miR-9-5p", "miR-4710", "miR-19b-3p", "miR-21-5p", "miR-15b-5p"), baseMean_df$Biomarkers, NA)
+
+baseMean_df$color_group <- ifelse(baseMean_df$baseMean > 8.965784, "above", "below")
+
+ggviolin(baseMean_df, y = "baseMean") + theme(aspect.ratio = 2) + geom_hline(yintercept = 8.965784, linetype = "dashed", color = "red", size = 1) +geom_point(aes(color = color_group))+ scale_color_manual(values = c("above" = "#E41A1C", "below" = "#377EB8"))
+```
+
+###load all (≥500 basemean)
+```{r}
+all_above500mean_metrics <- read.csv("Desktop/Heranova/manuscript/HerResolve_biological/RF/above500basemean_batch1/split_average_performance.csv", header = TRUE)
+
+all_above500mean_metrics <- all_above500mean_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(all_above500mean_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+all_above500mean_metrics <- all_above500mean_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(all_above500mean_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1) + ylim(0,1)
+```
+
+###load top20 (≥500 basemean)
+```{r}
+top20_above500mean_metrics <- read.csv("Desktop/Heranova/manuscript/HerResolve_biological/RF/above500basemean_top20_batch1/split_average_performance.csv", header = TRUE)
+
+top20_above500mean_metrics <- top20_above500mean_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(top20_above500mean_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+top20_above500mean_metrics <- top20_above500mean_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(top20_above500mean_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1) + ylim(0,1)
+```
+
+###load all after 92a correction (≥500 basemean)
+```{r}
+all_corrected_above500mean_metrics <- read.csv("Desktop/Heranova/manuscript/HerResolve_biological/RF/above500basemean_corrected_batch1/split_average_performance.csv", header = TRUE)
+
+all_corrected_above500mean_metrics <- all_corrected_above500mean_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(all_corrected_above500mean_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+all_corrected_above500mean_metrics <- all_corrected_above500mean_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(all_corrected_above500mean_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1) + ylim(0,1)
+```
+
+###load top20 corrected with 92a (≥500 basemean)
+```{r}
+top20_corrected_above500mean_metrics <- read.csv("Heranova/manuscript/HerResolve_biological/RF/above500basemean_corrected_top20_batch1/split_average_performance.csv", header = TRUE)
+
+top20_corrected_above500mean_metrics <- top20_corrected_above500mean_metrics %>% select(c("Mean.AUC", "Mean.Sensitivity.at.0.5", "Mean.Specificity.at.0.5"))
+
+colnames(top20_corrected_above500mean_metrics) <- c("AUC", "Sensitivity", "Specificity") 
+
+top20_corrected_above500mean_metrics <- top20_corrected_above500mean_metrics %>% pivot_longer(cols = everything(), names_to = "Metric", values_to = "Value") %>% as.data.frame()
+
+ggbarplot(top20_corrected_above500mean_metrics, x = "Metric", y = "Value", add = "mean_se", fill = "Metric", palette = "npg", lab.vjust = -1.6, lab.nb.digits = 2) + xlab("") + theme(aspect.ratio = 1) + ylim(0,1)
+```
+
+###plot qPCR validation
+```{r}
+batch14_df <- read.csv("Desktop/Heranova/miRNAseq/ddPCR_qPCR_tests/qPCR_secretory_markers_test/04Mar2025_all_markers_all_batches_forV1/qPCR_batch1234_data.txt") %>% as.data.frame()
+
+batch14_filtered_df <- batch14_df %>% dplyr::select(c("normalized_miR-21-5p_miR-92a-3p", "normalized_miR-15b-5p_miR-92a-3p", "normalized_miR-17-5p_miR-92a-3p", "normalized_miR-19b-3p_miR-92a-3p", "normalized_miR-23a-3p_miR-92a-3p", "sample", "group_lap", "group_his", "batch"))
+
+batch14_filtered_long_df <- batch14_filtered_df %>% pivot_longer(cols = starts_with("normalized"), names_to = "biomarkers", values_to = "values") %>% as.data.frame()
+
+ggboxplot(batch14_filtered_long_df, x = "biomarkers", y = "values", fill = "group_lap", palette = "jco", outlier.shape = NA) + theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1), aspect.ratio = 0.4) + stat_compare_means(aes(group = group_lap), label = "p.format")
+
+batch14_concordant_filtered_df <- batch14_filtered_df[batch14_filtered_df$group_lap == batch14_filtered_df$group_his, ]
+
+batch14_concordant_filtered_long_df <- batch14_concordant_filtered_df %>% pivot_longer(cols = starts_with("normalized"), names_to = "biomarkers", values_to = "values") %>% as.data.frame()
+
+ggboxplot(batch14_concordant_filtered_long_df, x = "biomarkers", y = "values", fill = "group_lap", palette = "jco", outlier.shape = NA) + theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1), aspect.ratio = 0.4) + stat_compare_means(aes(group = group_lap), label = "p.format")
+```
+
